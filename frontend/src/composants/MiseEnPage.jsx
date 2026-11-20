@@ -1,6 +1,6 @@
 // Cadre du portail : barre du haut (auto-école de travail), barre latérale bleu nuit (menus à pictogrammes, élément actif orange, pastilles),
 // menu replié derrière « Menu » sur téléphone. Majuscule à chaque mot (règle 18).
-import { BarChart3, Building2, ClipboardList, GraduationCap, LayoutDashboard, LogOut, Menu, Receipt, ShieldCheck, Tag, UserCog, Wallet, X, MapPin } from "lucide-react";
+import { MessageCircle, Star, Car, Package, ArrowLeftRight, CalendarCheck, BarChart3, Building2, ClipboardList, GraduationCap, LayoutDashboard, LogOut, Menu, Receipt, ShieldCheck, Tag, UserCog, Wallet, X, MapPin } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { useApp } from "../lib/contexte.jsx";
@@ -13,6 +13,13 @@ const TOUS_ECOLE = ["super_admin", "directeur", "gestionnaire", "secretaire", "c
 const MENU = [
   { chemin: "/", libelle: "tableau de bord", icone: LayoutDashboard, roles: ["super_admin", "directeur", "gestionnaire", "comptable"], ecole: true },
   { chemin: "/eleves", libelle: "élèves", icone: GraduationCap, roles: TOUS_ECOLE, ecole: true },
+  { chemin: "/examens", libelle: "examens", icone: CalendarCheck, roles: ["super_admin", "directeur", "gestionnaire", "secretaire", "comptable", "moniteur"], ecole: true },
+  { chemin: "/transferts", libelle: "transferts de dossiers", icone: ArrowLeftRight, roles: ["super_admin", "directeur", "gestionnaire"], ecole: true },
+  { chemin: "/statistiques", libelle: "statistiques d'examens", icone: BarChart3, roles: ["super_admin", "directeur", "gestionnaire", "comptable"], ecole: true },
+  { chemin: "/parc", libelle: "parc automobile", icone: Car, roles: ["super_admin", "directeur", "gestionnaire", "secretaire", "comptable", "moniteur", "mecanicien"], ecole: true },
+  { chemin: "/pieces", libelle: "pièces et approvisionnement", icone: Package, roles: ["super_admin", "directeur", "gestionnaire", "mecanicien"], ecole: true },
+  { chemin: "/messagerie", libelle: "centre de messagerie WA", icone: MessageCircle, roles: ["super_admin", "directeur", "gestionnaire", "secretaire"], ecole: true },
+  { chemin: "/avis", libelle: "évaluations des clients", icone: Star, roles: ["super_admin", "directeur", "gestionnaire", "secretaire", "comptable"], ecole: true },
   { chemin: "/caisse", libelle: "caisse et paiements", icone: Wallet, roles: ["super_admin", "directeur", "gestionnaire", "secretaire", "comptable"], ecole: true },
   { chemin: "/impayes", libelle: "impayés", icone: Receipt, roles: ["super_admin", "directeur", "gestionnaire", "secretaire", "comptable"], ecole: true },
   { chemin: "/tarifs", libelle: "tarifs et promotions", icone: Tag, roles: ["super_admin", "directeur", "gestionnaire", "secretaire", "comptable", "moniteur"], ecole: true },

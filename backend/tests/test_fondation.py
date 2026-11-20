@@ -183,5 +183,5 @@ def test_pastilles_du_menu(client):
     hs, hd = entete(client, "sec"), entete(client, "dir")
     t = nouveau_tarif(client, hd)
     nouvel_eleve(client, hs, t)                                     # dossier incomplet (pièces obligatoires non reçues)
-    assert client.get("/api/notifications/compteurs", headers=hs).json() == {"/eleves": 1, "/impayes": 0}
-    assert client.get("/api/notifications/compteurs", headers=entete(client, "mon")).json() == {"/eleves": 1}
+    assert client.get("/api/notifications/compteurs", headers=hs).json() == {"/eleves": 1, "/impayes": 0, "/parc": 0}
+    assert client.get("/api/notifications/compteurs", headers=entete(client, "mon")).json() == {"/eleves": 1, "/parc": 0}

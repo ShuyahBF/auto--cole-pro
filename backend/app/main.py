@@ -14,7 +14,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import auth, db, lot, roles, securite
 from .config import env, origines_site
 from .ecoles import routeur as routeur_ecoles
+from .examens import routeur as routeur_examens
+from .seances import routeur as routeur_seances
+from .transferts import routeur as routeur_transferts
 from .eleves import routeur as routeur_eleves
+from .avis import routeur as routeur_avis
+from .messagerie import routeur as routeur_messagerie, rappels_veille
+from .parc import routeur as routeur_parc
+from .pieces import routeur as routeur_pieces
 from .paiements import routeur as routeur_paiements
 from .tableau import routeur as routeur_tableau
 from .tarifs import routeur as routeur_tarifs
@@ -33,7 +40,7 @@ async def cycle_de_vie(_app):
 app = FastAPI(title="AutoÉcole Pro", version=lot.VERSION, lifespan=cycle_de_vie)
 # CORS : seul le site web (FRONTEND_ORIGIN) peut appeler l'API depuis un navigateur.
 app.add_middleware(CORSMiddleware, allow_origins=origines_site(), allow_methods=["*"], allow_headers=["*"])
-for _r in (routeur_utilisateurs, routeur_ecoles, routeur_tarifs, routeur_eleves, routeur_paiements, routeur_tableau):
+for _r in (routeur_utilisateurs, routeur_ecoles, routeur_tarifs, routeur_eleves, routeur_paiements, routeur_tableau, routeur_examens, routeur_seances, routeur_transferts, routeur_parc, routeur_pieces, routeur_messagerie, routeur_avis):
     app.include_router(_r, prefix="/api")
 
 
@@ -85,7 +92,19 @@ def presence_sawali() -> None:
         time.sleep(300)
 
 
+def rappels_en_boucle() -> None:
+    """Rappels automatiques « la veille de l'examen » (option par école) : vérifiés toutes les 5 minutes. Une panne n'arrête jamais la boucle."""
+    while True:
+        try:
+            rappels_veille()
+        except Exception as e:
+            print("Rappels automatiques en échec :", type(e).__name__)
+        time.sleep(300)
+
+
 def demarrage() -> None:
+    if env("TACHES_DE_FOND", "1") != "0":
+        threading.Thread(target=rappels_en_boucle, daemon=True).start()
     if env("PRESENCE_SAWALI", "1") != "0":
         threading.Thread(target=presence_sawali, daemon=True).start()
     try:

@@ -6,7 +6,7 @@ from datetime import date
 from fastapi import APIRouter, Depends
 
 from . import db, roles
-from .auth import exiger_roles
+from .auth import exiger_roles, utilisateur_courant
 from .eleves import STATUTS
 from .tarifs import arrondi
 
@@ -50,22 +50,28 @@ def tableau(u: dict = Depends(exiger_roles(roles.LECTURE_STATS))):
 
 
 @routeur.get("/notifications/compteurs")
-def compteurs(u: dict = Depends(exiger_roles(roles.LECTURE_ELEVE))):
+def compteurs(u: dict = Depends(utilisateur_courant)):
     """
-    Pastilles du menu (une seule route légère, filtrée par droits) : nombre d'impayés EN RETARD d'échéancier pour « Impayés » et de dossiers incomplets pour « Élèves ».
-    Aucun calcul lourd : une lecture des élèves et une des paiements.
+    Pastilles du menu (une seule route légère, filtrée par droits) : « Élèves » = dossiers incomplets, « Impayés » = élèves en retard d'échéancier,
+    « Parc automobile » = alertes rouges (panne immobilisante, document expiré, rupture de pièce). Aucun calcul lourd.
     """
-    aujourdhui = date.today().isoformat()
-    fe: dict = {"statut": {"$nin": ["abandon", "transfere", "diplome"]}}
-    if u["agence_id"]:
-        fe["agence_id"] = u["agence_id"]
-    eleves = list(db.base().eleves.find(fe, {"_id": 0, "id": 1, "net_a_payer": 1, "echeances": 1, "pieces": 1}))
-    obligatoires = [p["cle"] for p in (db.brut().ecoles.find_one({"id": u["ecole_id"]}) or {}).get("pieces", []) if p.get("obligatoire")]
-    incomplets = sum(1 for e in eleves if any(not (e.get("pieces") or {}).get(c) for c in obligatoires))
-    out = {"/eleves": incomplets}
-    if u["role"] in roles.LECTURE_FINANCE:
-        paye: dict = {}
-        for p in db.base().paiements.find({"annule": {"$ne": True}}, {"eleve_id": 1, "montant": 1}):
-            paye[p["eleve_id"]] = paye.get(p["eleve_id"], 0) + p["montant"]
-        out["/impayes"] = sum(1 for e in eleves if sum(x["montant"] for x in e.get("echeances", []) if x["date"] < aujourdhui) > paye.get(e["id"], 0))
+    out: dict = {}
+    if u["ecole_id"] is None:
+        return out
+    if u["role"] in roles.LECTURE_ELEVE:
+        aujourdhui = date.today().isoformat()
+        fe: dict = {"statut": {"$nin": ["abandon", "transfere", "diplome"]}}
+        if u["agence_id"]:
+            fe["agence_id"] = u["agence_id"]
+        eleves = list(db.base().eleves.find(fe, {"_id": 0, "id": 1, "net_a_payer": 1, "echeances": 1, "pieces": 1}))
+        obligatoires = [p["cle"] for p in (db.brut().ecoles.find_one({"id": u["ecole_id"]}) or {}).get("pieces", []) if p.get("obligatoire")]
+        out["/eleves"] = sum(1 for e in eleves if any(not (e.get("pieces") or {}).get(c) for c in obligatoires))
+        if u["role"] in roles.LECTURE_FINANCE:
+            paye: dict = {}
+            for p in db.base().paiements.find({"annule": {"$ne": True}}, {"eleve_id": 1, "montant": 1}):
+                paye[p["eleve_id"]] = paye.get(p["eleve_id"], 0) + p["montant"]
+            out["/impayes"] = sum(1 for e in eleves if sum(x["montant"] for x in e.get("echeances", []) if x["date"] < aujourdhui) > paye.get(e["id"], 0))
+    if u["role"] in roles.LECTURE_PARC:
+        from .parc import calculer_alertes
+        out["/parc"] = sum(1 for a in calculer_alertes(u) if a["niveau"] == "rouge")
     return out

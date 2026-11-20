@@ -5,4 +5,4 @@ Modifier ce fichier force aussi le redéploiement sur Render (le service a un ro
 """
 VERSION = "1.0"
 LOT = "1"
-LOT_LIBELLE = "Fondation : auto-écoles et agences, comptes et rôles, tarifs et promotions, inscriptions des élèves, paiements et reçus, tableau de bord."
+LOT_LIBELLE = "Première version : auto-écoles multi-pays, élèves, paiements, examens, transferts, parc automobile, pièces, messagerie WhatsApp, évaluations des clients."

@@ -64,6 +64,33 @@ function Inscription({ onFermer, onFait }) {
   );
 }
 
+/** Livret de progression : heures effectuées / prévues, séances récentes, ajout d'une séance (moniteur et personnel), parcours d'examens. */
+function Livret({ id, statut }) {
+  const { avecToast, utilisateur } = useApp();
+  const [l, setL] = useState(null);
+  const [ex, setEx] = useState([]);
+  const [n, setN] = useState({ type: "conduite", duree_min: 60, theme: "", appreciation: "" });
+  const charger = useCallback(() => { api(`/eleves/${id}/seances`).then(setL).catch(() => {}); api(`/eleves/${id}/examens`).then(setEx).catch(() => {}); }, [id]);
+  useEffect(() => { charger(); }, [charger]);
+  if (!l) return null;
+  const peut = ["moniteur", "secretaire", "gestionnaire", "directeur", "super_admin"].includes(utilisateur.role) && !["abandon", "transfere", "diplome"].includes(statut);
+  const pct = l.heures_prevues ? Math.min(100, Math.round((l.heures_conduite / l.heures_prevues) * 100)) : 0;
+  const ajouter = () => avecToast("Enregistrement de la séance", () => api(`/eleves/${id}/seances`, { methode: "POST", corps: n }), () => "Séance enregistrée").then(() => { setN({ ...n, theme: "" }); charger(); }).catch(() => {});
+  return (
+    <section className="mt-4"><h3 className="text-sm font-semibold">Livret de progression</h3>
+      <p className="mt-1 text-sm">Conduite : <b>{l.heures_conduite} h</b> sur {l.heures_prevues} h prévues · Code : <b>{l.seances_code}</b> sur {l.seances_code_prevues} séances</p>
+      <div className="mt-1 h-2 overflow-hidden rounded-full bg-brume"><div className="h-full rounded-full bg-emeraude" style={{ width: `${pct}%` }} /></div>
+      {peut && <div className="mt-2 grid gap-x-2 sm:grid-cols-4">
+        <Liste libelle="Séance" valeur={n.type} onChange={(x) => setN({ ...n, type: x })} vide={null} options={[{ valeur: "conduite", libelle: "Conduite" }, { valeur: "code", libelle: "Code" }]} />
+        <Texte libelle="Durée (min)" type="number" valeur={n.duree_min} onChange={(x) => setN({ ...n, duree_min: x })} min="15" /><Texte libelle="Thème" valeur={n.theme} onChange={(x) => setN({ ...n, theme: x })} />
+        <Liste libelle="Appréciation" valeur={n.appreciation} onChange={(x) => setN({ ...n, appreciation: x })} vide="—" options={[{ valeur: "insuffisant", libelle: "Insuffisant" }, { valeur: "en_progres", libelle: "En progrès" }, { valeur: "acquis", libelle: "Acquis" }, { valeur: "maitrise", libelle: "Maîtrisé" }]} /></div>}
+      {peut && <Bouton icone={Save} variante="vert" petit onClick={ajouter}>Enregistrer la séance</Bouton>}
+      {l.seances.length > 0 && <table className="tableau mt-2"><thead><tr><th>Date</th><th>Type</th><th className="num">Min</th><th>Thème</th><th>Moniteur</th></tr></thead><tbody>{l.seances.slice(0, 8).map((s) => <tr key={s.id}><td>{dateFr(s.date)}</td><td>{s.type === "code" ? "Code" : "Conduite"}</td><td className="num">{s.duree_min}</td><td>{s.theme}</td><td>{s.moniteur}</td></tr>)}</tbody></table>}
+      {ex.length > 0 && <><h3 className="mt-3 text-sm font-semibold">Examens</h3><ul className="mt-1 space-y-1 text-sm">{ex.map((i) => <li key={i.id} className="flex items-center gap-2">{dateFr(i.date)} · {i.epreuve} ({i.type === "externe" ? "externe" : "interne"}) · tentative {i.tentative} <Pastille couleur={{ admis: "vert", ajourne: "rouge", absent: "orange" }[i.statut] || "gris"}>{{ admis: "Admis", ajourne: "Ajourné", absent: "Absent", inscrit: "Inscrit" }[i.statut]}</Pastille></li>)}</ul></>}
+    </section>
+  );
+}
+
 /** Dossier d'un élève : identité, pièces, échéancier, statut, paiements et encaissement. */
 function Dossier({ id, onFermer, onChange }) {
   const { parametres, toast, avecToast } = useApp();
@@ -96,6 +123,7 @@ function Dossier({ id, onFermer, onChange }) {
         {e.promotion && <p className="mb-2 text-xs text-ardoise">Promotion {e.promotion} : remise de {m(e.remise)} sur {m(e.prix)}</p>}
         <p className="mb-1 text-xs font-semibold text-ardoise">Pièces du dossier (cochez dès réception)</p>
         {(parametres?.pieces || []).map((p) => <Case key={p.cle} libelle={`${p.libelle}${p.obligatoire ? " *" : ""}`} valeur={e.pieces?.[p.cle]} onChange={(x) => basculerPiece(p.cle, x)} />)}
+        <Livret id={id} statut={e.statut} />
         {finance && e.reste_du > 0 && e.statut !== "abandon" && (
           <div className="mt-3 rounded-2xl bg-brume p-3">
             <p className="mb-2 text-sm font-semibold">Encaisser un paiement</p>

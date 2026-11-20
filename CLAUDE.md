@@ -30,3 +30,23 @@ pastilles de notifications dans le menu, présence déclarée à SAWALI, outils 
 ## Tests avant toute livraison
 - `cd backend && python -m pytest tests -q` (base en mémoire `mongomock`).
 - `cd frontend && npm test && npm run build`.
+
+## Lot 2 : examens, transferts, livret (20/11/2026)
+- L'ORDRE des épreuves des paramètres de l'école fixe la progression (une épreuve exige d'avoir été ADMIS à la précédente, même catégorie) ; admis à la dernière = « Permis obtenu ».
+- Éligibilité à une session (`examens.controle_eligibilite`, refaite par le serveur) : élève actif, même catégorie, dossier complet, pas d'impayé en RETARD (un responsable peut `forcer` pour un examen INTERNE seulement), pas déjà inscrit, places.
+- Convocation PDF (A5), liste de présence PDF (A4), planning du mois, statistiques (`/statistiques/examens` : taux de réussite sans compter les absents, tentatives, délai jusqu'au permis).
+- Transferts : entre agences (responsables), sortant (reste dû = confirmation du solde, dossier PDF, élève « Transféré »), entrant (inscription + école d'origine + heures reprises au livret). Rien n'est supprimé.
+- Livret de progression (`seances.py`) : séances de conduite / code consignées par le moniteur (durée 15-480 min), heures effectuées vs prévues ; seuls les responsables corrigent.
+
+## Lot 3 : parc automobile (20/11/2026)
+- Le kilométrage ne recule JAMAIS (relevé, plein) ; seul un responsable corrige avec motif. Consommation = entre deux pleins COMPLETS, anomalie au-delà de 40 % de la moyenne du véhicule.
+- Panne « immobilisante » → véhicule « en panne » ; libéré quand plus aucune panne immobilisante n'est ouverte. Intervention terminée : pièces décomptées du stock (409 si insuffisant, rien décompté), coût = main-d'œuvre + pièces, panne liée résolue, prochain entretien.
+- Les MONTANTS du parc ne sont vus que par `COUTS_PARC` (comptable, mécanicien, responsables) : le serveur les retire (`parc._masquer`). Moniteur et secrétariat : aucun montant.
+- Alertes (`parc.calculer_alertes`) : documents expirés / à 30 jours, entretien dû, pannes ouvertes, pièces sous le seuil, consommation anormale ; pastille « Parc automobile » = alertes rouges. Stock jamais négatif, commandes brouillon → commandée → reçue (la réception crée les entrées de stock et met à jour le prix).
+
+## Lot 4 : messagerie WhatsApp et évaluations (20/11/2026)
+- WhatsApp par la Transmission universelle (Liluvine) de SAWALI : `backend/app/whatsapp.py` (protocole signé HMAC, émetteur par défaut « autoecole »). Variables Render : `LILUVINE_WA_URL`, `LILUVINE_WA_HMAC` (SECRET), `LILUVINE_WA_EMETTEUR`, `FRONTEND_ORIGIN`.
+- LIGNE PRIVÉE d'une école : fiche école (`wa_emetteur`, `wa_repli`, réglés par le super administrateur via `PUT /api/messagerie/ligne`) + variable Render `LILUVINE_WA_HMAC_<PRÉFIXE>` ; sans elle l'école reste sur la ligne partagée, sans changer le code.
+- ADRESSE DE RETOUR de SAWALI (règle 7) : `POST /api/webhooks/liluvine-retour` (signée, 5 min) : `stats_du_jour`, `statut`, `reponse` (« 1 / 2 » confirment ou excusent l'examen), `desinscription` (STOP). À saisir dans SAWALI : émetteur « autoecole » → « URL de retour » = `https://<serveur AutoÉcole Pro>/api/webhooks/liluvine-retour` (« URL des statistiques » vide).
+- Aucun montant ni donnée de santé par WhatsApp ; le texte d'un message n'est jamais journalisé ; envoi toujours en arrière-plan.
+- Évaluations : lien personnel à usage unique (seule l'empreinte SHA-256 du jeton est gardée, 30 jours), page publique `/avis/<jeton>` sans compte, satisfaction 1-5, NPS 0-10, critères, publication seulement si le client l'a autorisée ; le moniteur évalué est déduit du livret.

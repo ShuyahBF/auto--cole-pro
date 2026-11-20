@@ -164,6 +164,8 @@ def inscrire(corps: dict, u: dict = Depends(exiger_roles(roles.ECRITURE_ELEVE)))
         fiche["echeances"] = ech
     db.base().eleves.insert_one(fiche)
     journaliser("eleve_inscrit", u, fiche["matricule"])
+    from .messagerie import notifier
+    notifier("inscription", fiche)                       # message de bienvenue (option par école ; ne bloque jamais l'inscription)
     return _public(fiche, 0)
 
 
