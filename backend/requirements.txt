@@ -1,0 +1,7 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pymongo==4.10.1
+PyJWT==2.10.1
+cryptography==44.0.3
+reportlab==4.2.5            # reçus, bons et états PDF
+pillow==11.1.0              # logo de l'auto-école : vérification et réduction de l'image
