@@ -181,7 +181,7 @@ def creer(corps: dict, u: dict = Depends(exiger_roles(roles.SUPER_ADMIN))):
     ancien = db.ecole_courante.get()
     db.fixer_ecole(e["id"])                                  # le temps de créer l'agence principale DANS la nouvelle école
     try:
-        creer_agence("SIÈGE", principale=True, ville=e.get("ville", ""))
+        creer_agence("Siège", principale=True, ville=e.get("ville", ""))
     finally:
         db.fixer_ecole(ancien)
     if directeur:
@@ -250,7 +250,7 @@ def lister_agences(u: dict = Depends(utilisateur_courant)):
 @routeur.post("/agences")
 def creer_une_agence(corps: dict, u: dict = Depends(exiger_roles(roles.ADMINISTRATION))):
     """Nouvelle agence (directeur)."""
-    nom = validation.texte(corps, "nom", "Nom de l'agence", True, 80, majuscules=True)   # intitulé de l'agence : MAJUSCULES
+    nom = validation.texte(corps, "nom", "Nom de l'agence", True, 80, premiere_majuscule=True)   # nom ordinaire (pas une clé) : 1re lettre en majuscule
     if db.base().agences.find_one({"nom": nom}):
         raise HTTPException(409, "Une agence porte déjà ce nom")
     a = creer_agence(nom, ville=validation.texte(corps, "ville", "Ville", False, 80), adresse=validation.texte(corps, "adresse", "Adresse", False, 160),
@@ -268,7 +268,7 @@ def modifier_agence(id_: str, corps: dict, u: dict = Depends(exiger_roles(roles.
     maj = {}
     for cle, libelle, longueur in (("nom", "Nom", 80), ("ville", "Ville", 80), ("adresse", "Adresse", 160), ("telephone", "Téléphone", 40)):
         if cle in corps:
-            maj[cle] = validation.texte(corps, cle, libelle, cle == "nom", longueur, majuscules=(cle == "nom"))
+            maj[cle] = validation.texte(corps, cle, libelle, cle == "nom", longueur, premiere_majuscule=(cle == "nom"))
     if "actif" in corps and bool(corps["actif"]) != a.get("actif", True):
         if not corps["actif"] and (a.get("principale") or db.base().eleves.count_documents({"agence_id": id_, "statut": {"$in": ["inscrit", "en_formation", "pret_examen"]}}, limit=1)):
             raise HTTPException(409, "Cette agence est principale ou a encore des élèves en formation : elle ne peut pas être désactivée")

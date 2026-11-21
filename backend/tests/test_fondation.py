@@ -22,7 +22,7 @@ def test_ecole_creee_avec_agence_et_directeur(client):
     r = client.post("/api/auth/login", json={"login": "dsahel", "mot_de_passe": "Motdepasse9"})
     hd = {"Authorization": "Bearer " + r.json()["jeton"]}
     assert [e["prefixe"] for e in client.get("/api/ecoles", headers=hd).json()] == ["SAH"]
-    assert [a["nom"] for a in client.get("/api/agences", headers=hd).json()] == ["SIÈGE"]
+    assert [a["nom"] for a in client.get("/api/agences", headers=hd).json()] == ["Siège"]
 
 
 def test_isolation_des_ecoles(client):
@@ -187,15 +187,16 @@ def test_pastilles_du_menu(client):
     assert client.get("/api/notifications/compteurs", headers=entete(client, "mon")).json() == {"/eleves": 1, "/parc": 0}
 
 
-def test_intitules_des_entites_toujours_en_majuscules(client):
-    """Règle du propriétaire (21/11/2026) : le nom d'une auto-école et celui d'une agence sont enregistrés en MAJUSCULES (accents gardés)."""
+def test_champs_cles_en_majuscules_et_noms_ordinaires_en_1re_lettre(client):
+    """Règle du propriétaire (21/11/2026) : un champ CLÉ (nom de l'auto-école, code, référence, immatriculation) est en MAJUSCULES ;
+    un nom ordinaire (ex. une agence « Bobo ») prend seulement une 1re lettre majuscule."""
     h = entete(client, "sa")
     r = client.post("/api/ecoles", json={"nom": "Sawali excellence auto-école", "prefixe": "SWL", "pays": "BF"}, headers=h)
     assert r.status_code == 200, r.text
     assert r.json()["nom"] == "SAWALI EXCELLENCE AUTO-ÉCOLE"
     hd = entete(client, "dir")
-    r = client.post("/api/agences", json={"nom": "Agence nord"}, headers=hd)
+    r = client.post("/api/agences", json={"nom": "bobo-dioulasso"}, headers=hd)
     assert r.status_code == 200, r.text
-    assert r.json()["nom"] == "AGENCE NORD"
-    r = client.put(f"/api/agences/{r.json()['id']}", json={"nom": "Agence nord-est"}, headers=hd)
-    assert r.status_code == 200 and r.json()["nom"] == "AGENCE NORD-EST"
+    assert r.json()["nom"] == "Bobo-dioulasso"
+    r = client.put(f"/api/agences/{r.json()['id']}", json={"nom": "agence Nord"}, headers=hd)
+    assert r.status_code == 200 and r.json()["nom"] == "Agence Nord"

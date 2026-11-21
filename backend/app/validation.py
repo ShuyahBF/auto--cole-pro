@@ -18,11 +18,13 @@ def normaliser(texte: str) -> str:
     return "".join(c for c in t if unicodedata.category(c) != "Mn")
 
 
-def texte(corps: dict, cle: str, libelle: str, obligatoire: bool = False, max_len: int = 200, majuscules: bool = False) -> str:
-    """Texte nettoyé (espaces) ; obligatoire ou non. `majuscules` : intitulé d'une entité (auto-école, agence…), TOUJOURS enregistré en MAJUSCULES (accents gardés)."""
+def texte(corps: dict, cle: str, libelle: str, obligatoire: bool = False, max_len: int = 200, majuscules: bool = False, premiere_majuscule: bool = False) -> str:
+    """Texte nettoyé (espaces) ; obligatoire ou non. `majuscules` : champ CLÉ d'une fiche (nom de l'auto-école, code, référence, immatriculation…), enregistré en MAJUSCULES (accents gardés) ; `premiere_majuscule` : nom ordinaire, 1re lettre en majuscule."""
     v = str(corps.get(cle) or "").strip()
     if majuscules:
         v = v.upper()
+    elif premiere_majuscule:
+        v = v[:1].upper() + v[1:]          # nom ordinaire (ex. « Bobo ») : seule la 1re lettre est forcée, le reste est laissé tel quel
     if obligatoire and not v:
         erreur(f"{libelle} : champ obligatoire")
     if len(v) > max_len:

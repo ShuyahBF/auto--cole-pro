@@ -79,7 +79,7 @@ export default function Parametres() {
           <h2 className="font-semibold">Agences</h2>
           <ul className="mt-2 divide-y divide-slate-100 text-sm">{agences.map((a) => <li key={a.id} className="flex items-center justify-between py-1.5"><span>{a.nom} {a.principale && <Pastille couleur="bleu">Principale</Pastille>} {!a.actif && <Pastille>Désactivée</Pastille>}</span>
             {!a.principale && <BoutonIcone icone={Power} libelle={a.actif ? "Désactiver" : "Activer"} couleur={a.actif ? "text-rose-600" : "text-emerald-600"} onClick={() => basculerAgence(a)} />}</li>)}</ul>
-          <div className="mt-3 flex items-end gap-2"><div className="flex-1"><Texte libelle="Nouvelle agence" majuscules valeur={nouvelleAgence} onChange={setNouvelleAgence} placeholder="AGENCE DE BOBO-DIOULASSO" /></div><div className="pb-3"><Bouton icone={Plus} petit disabled={!nouvelleAgence.trim()} onClick={ajouterAgence}>Ajouter</Bouton></div></div>
+          <div className="mt-3 flex items-end gap-2"><div className="flex-1"><Texte libelle="Nouvelle agence" premiereMajuscule valeur={nouvelleAgence} onChange={setNouvelleAgence} placeholder="Bobo-Dioulasso" /></div><div className="pb-3"><Bouton icone={Plus} petit disabled={!nouvelleAgence.trim()} onClick={ajouterAgence}>Ajouter</Bouton></div></div>
         </section>)}
     </div>
   );

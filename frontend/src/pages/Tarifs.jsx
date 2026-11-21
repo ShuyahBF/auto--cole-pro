@@ -19,7 +19,7 @@ function TarifModal({ tarif, onFermer, onFait }) {
     <Modal titre={tarif ? "Modifier le tarif" : "Nouveau tarif"} onFermer={onFermer} pied={<>
       <Bouton icone={Save} variante="principal" disabled={!f.modifie} onClick={enregistrer}>Enregistrer</Bouton><Bouton onClick={onFermer}>Annuler</Bouton>
       {f.modifie && <span className="self-center text-xs text-orange-700">modifié, non enregistré</span>}</>}>
-      {!tarif && <Texte libelle="Code *" valeur={v.code} onChange={(x) => f.maj("code", x)} placeholder="B-STANDARD" />}
+      {!tarif && <Texte libelle="Code *" majuscules valeur={v.code} onChange={(x) => f.maj("code", x)} placeholder="B-STANDARD" />}
       <Texte libelle="Libellé *" valeur={v.libelle} onChange={(x) => f.maj("libelle", x)} placeholder="Permis B — formule standard" />
       <Liste libelle="Catégorie de permis *" valeur={v.categorie} onChange={(x) => f.maj("categorie", x)} options={(parametres?.categories || []).map((c) => ({ valeur: c.code, libelle: `${c.code} — ${c.libelle}` }))} />
       <div className="grid gap-x-3 grid-cols-2">
@@ -40,7 +40,7 @@ function PromoModal({ onFermer, onFait }) {
   const enregistrer = () => avecToast("Enregistrement de la promotion", () => api("/promotions", { methode: "POST", corps: v }), () => "Promotion enregistrée").then(onFait).catch(() => {});
   return (
     <Modal titre="Nouvelle promotion" onFermer={onFermer} pied={<><Bouton icone={Save} variante="principal" disabled={!f.modifie} onClick={enregistrer}>Enregistrer</Bouton><Bouton onClick={onFermer}>Annuler</Bouton></>}>
-      <Texte libelle="Code *" valeur={v.code} onChange={(x) => f.maj("code", x)} placeholder="RENTREE" /><Texte libelle="Libellé *" valeur={v.libelle} onChange={(x) => f.maj("libelle", x)} />
+      <Texte libelle="Code *" majuscules valeur={v.code} onChange={(x) => f.maj("code", x)} placeholder="RENTREE" /><Texte libelle="Libellé *" valeur={v.libelle} onChange={(x) => f.maj("libelle", x)} />
       <div className="grid grid-cols-2 gap-x-3">
         <Liste libelle="Type de remise" valeur={v.type} onChange={(x) => f.maj("type", x)} vide={null} options={[{ valeur: "pourcentage", libelle: "Pourcentage" }, { valeur: "montant", libelle: `Montant (${parametres?.devise || ""})` }]} />
         <Texte libelle="Valeur *" type="number" valeur={v.valeur} onChange={(x) => f.maj("valeur", x)} min="0" />
