@@ -22,7 +22,7 @@ function NouvelleEcole({ onFermer, onFait }) {
   return (
     <Modal titre="Nouvelle auto-école" large onFermer={onFermer} pied={<><Bouton icone={Save} variante="principal" disabled={!f.modifie} onClick={enregistrer}>Créer</Bouton><Bouton onClick={onFermer}>Annuler</Bouton></>}>
       <div className="grid gap-x-3 sm:grid-cols-2">
-        <Texte libelle="Nom *" valeur={v.nom} onChange={(x) => f.maj("nom", x)} placeholder="Auto-école Excellence" />
+        <Texte libelle="Nom *" majuscules valeur={v.nom} onChange={(x) => f.maj("nom", x)} placeholder="AUTO-ÉCOLE EXCELLENCE" />
         <Texte libelle="Préfixe des matricules *" valeur={v.prefixe} onChange={(x) => f.maj("prefixe", x.toUpperCase())} placeholder="EXC" maxLength={6} />
         <Liste libelle="Pays *" valeur={v.pays} onChange={(x) => f.maj("pays", x)} options={pays.map((p) => ({ valeur: p.code, libelle: `${p.nom} (${p.devise})` }))} />
         <Texte libelle="Ville" valeur={v.ville} onChange={(x) => f.maj("ville", x)} /><Texte libelle="Téléphone" valeur={v.telephone} onChange={(x) => f.maj("telephone", x)} />

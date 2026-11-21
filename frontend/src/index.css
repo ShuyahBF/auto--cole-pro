@@ -49,3 +49,6 @@ table.tableau th.trie { background: #fed7aa; color: #0A1E3D; }
     overflow: visible !important;
   }
 }
+
+/* Champ obligatoire vide à la validation d'une fiche (règle du 21/11/2026) : fond rouge clair + bordure rouge (jamais la couleur seule : message et « * » aussi) */
+.champ-manquant { background-color: #fecdd3 !important; border-color: #e11d48 !important; }

@@ -18,9 +18,11 @@ def normaliser(texte: str) -> str:
     return "".join(c for c in t if unicodedata.category(c) != "Mn")
 
 
-def texte(corps: dict, cle: str, libelle: str, obligatoire: bool = False, max_len: int = 200) -> str:
-    """Texte nettoyé (espaces) ; obligatoire ou non."""
+def texte(corps: dict, cle: str, libelle: str, obligatoire: bool = False, max_len: int = 200, majuscules: bool = False) -> str:
+    """Texte nettoyé (espaces) ; obligatoire ou non. `majuscules` : intitulé d'une entité (auto-école, agence…), TOUJOURS enregistré en MAJUSCULES (accents gardés)."""
     v = str(corps.get(cle) or "").strip()
+    if majuscules:
+        v = v.upper()
     if obligatoire and not v:
         erreur(f"{libelle} : champ obligatoire")
     if len(v) > max_len:

@@ -28,6 +28,12 @@ export function Fournisseur({ children }) {
     return id;
   }, []);
   const retirer = useCallback((id) => setToasts((t) => t.filter((x) => x.id !== id)), []);
+  // Fiche incomplète (lib/validationFormulaires.js) : message listant les champs obligatoires manquants (champs en fond rouge)
+  useEffect(() => {
+    const surManquants = (e) => toast(`Champs obligatoires à renseigner : ${e.detail.manquants.join(", ")}`, "erreur");
+    window.addEventListener("champs-manquants", surManquants);
+    return () => window.removeEventListener("champs-manquants", surManquants);
+  }, [toast]);
 
   /** Action asynchrone avec toast « … en cours » puis résultat (règle 17 : jamais d'actualisation silencieuse). */
   const avecToast = useCallback(async (enCours, action, resultat) => {

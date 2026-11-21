@@ -1,20 +1,31 @@
 // Champs de formulaire communs : étiquette + saisie, liste déroulante (listes finies : règle 10), case à cocher.
 export const classeChamp = "w-full rounded-lg border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-500 bg-white";
 
+/** Un intitulé qui se termine par « * » désigne un champ OBLIGATOIRE : l'étoile est collée au mot (« Nom* »), en rouge, et l'étiquette est marquée pour le contrôle
+ *  à la validation de la fiche (lib/validationFormulaires.js : champs vides en fond rouge). */
+export function decouperIntitule(libelle) {
+  const brut = String(libelle ?? "");
+  const requis = /\s*\*\s*$/.test(brut);
+  return { texte: requis ? brut.replace(/\s*\*\s*$/, "") : brut, requis };
+}
+
 export function Champ({ libelle, children, aide }) {
+  const { texte, requis } = decouperIntitule(libelle);
   return (
-    <label className="block mb-3">
-      <span className="mb-1 block text-xs font-semibold tracking-wide text-ardoise">{libelle}</span>
+    <label className="block mb-3" {...(requis ? { "data-requis": "oui" } : {})}>
+      <span className="mb-1 block text-xs font-semibold tracking-wide text-ardoise"><span data-intitule>{texte}</span>{requis && <span className="text-rose-600" aria-hidden="true">*</span>}{requis && <span className="sr-only"> (obligatoire)</span>}</span>
       {children}
       {aide && <span className="block text-xs text-slate-500 mt-1">{aide}</span>}
     </label>
   );
 }
 
-export function Texte({ libelle, valeur, onChange, type = "text", placeholder, aide, ...autres }) {
+/** `majuscules` : intitulé d'une entité (nom de l'auto-école, de l'agence…) : saisi et enregistré TOUJOURS en MAJUSCULES (règle du propriétaire, 21/11/2026). */
+export function Texte({ libelle, valeur, onChange, type = "text", placeholder, aide, majuscules = false, ...autres }) {
   return (
     <Champ libelle={libelle} aide={aide}>
-      <input type={type} value={valeur ?? ""} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} className={classeChamp} {...autres} />
+      <input type={type} value={valeur ?? ""} onChange={(e) => onChange(majuscules ? e.target.value.toLocaleUpperCase("fr-FR") : e.target.value)} placeholder={placeholder}
+        className={`${classeChamp}${majuscules ? " uppercase" : ""}`} {...autres} />
     </Champ>
   );
 }
