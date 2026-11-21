@@ -59,3 +59,8 @@ pastilles de notifications dans le menu, présence déclarée à SAWALI, outils 
 - **Fiche incomplète = champs manquants en fond rouge** : module global `lib/validationFormulaires.js` (installé dans `main.jsx`, rien à ajouter fiche par fiche). Au clic sur le bouton principal d'une fenêtre ou d'un formulaire
   (`Bouton variante="principal"` porte `data-principal`), les champs obligatoires vides passent en fond rouge (`.champ-manquant`), le premier reçoit le curseur, un toast liste les champs manquants et l'action n'est PAS lancée ; le rouge disparaît à la saisie.
   Le serveur refait toujours le contrôle. Vérifié dans un vrai navigateur (fenêtre « Nouvelle auto-école »).
+
+## Nouvelle version du site : bandeau « Actualiser » (lot 7, propriétaire 21/11/2026 : « je n'ai pas reçu de bandeau de mise à jour »)
+- `composants/NouvelleVersionBandeau.jsx` + `lib/versionSite.js` (même principe que SAWALI, ALBARKA et ShuyahStore) : à l'ouverture, toutes les 5 minutes et quand la page redevient visible, la page d'accueil est relue SANS cache ; si les noms de ses fichiers principaux
+  (`/assets/index-<empreinte>.js|css`) diffèrent de ceux de la page ouverte, un bandeau « Une nouvelle version d'AutoÉcole Pro est disponible » propose « Actualiser » (recharge) ou « Plus tard ». Vérification en arrière-plan, aucun effet en développement. Tests : `npm test`.
+- Tout NOUVEAU site du propriétaire reçoit ce bandeau dès sa première version (sans lui, un utilisateur garde l'ancienne version jusqu'à ce qu'il recharge la page).
