@@ -1,6 +1,7 @@
 // Routes : connexion si non connecté ; changement de mot de passe obligatoire après réinitialisation.
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import MiseEnPage from "./composants/MiseEnPage.jsx";
+import NouvelleVersionBandeau from "./composants/NouvelleVersionBandeau.jsx";
 import Toasts from "./composants/Toasts.jsx";
 import { useApp } from "./lib/contexte.jsx";
 import Caisse from "./pages/Caisse.jsx";
@@ -57,6 +58,7 @@ export default function App() {
           </Route>
         </Routes>)}
       <Toasts />
+      <NouvelleVersionBandeau />      {/* nouvelle version en ligne : propose « Actualiser » (21/11/2026) */}
     </>
   );
 }
