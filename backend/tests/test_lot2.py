@@ -113,7 +113,7 @@ def test_transferts(client):
     bobo = client.post("/api/agences", json={"nom": "Bobo"}, headers=hd).json()
     assert client.post("/api/transferts/agence", json={"eleve_id": e["id"], "agence_id": bobo["id"]}, headers=hs).status_code == 403     # secrétaire : non
     assert client.post("/api/transferts/agence", json={"eleve_id": e["id"], "agence_id": bobo["id"], "motif": "Déménagement"}, headers=hd).status_code == 200
-    assert client.get(f"/api/eleves/{e['id']}", headers=hd).json()["agence_nom"] == "BOBO"
+    assert client.get(f"/api/eleves/{e['id']}", headers=hd).json()["agence_nom"] == "Bobo"
     assert client.post("/api/transferts/agence", json={"eleve_id": e["id"], "agence_id": bobo["id"]}, headers=hd).status_code == 409
     # Sortant avec reste dû : confirmation exigée
     assert client.post("/api/transferts/sortant", json={"eleve_id": e["id"], "ecole_destination": "Auto-école Sahel"}, headers=hd).status_code == 409

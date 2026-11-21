@@ -19,7 +19,7 @@ function NouvellePiece({ onFermer, onFait, prix }) {
   const v = f.valeurs;
   return (
     <Modal titre="Nouvelle pièce" onFermer={onFermer} pied={<><Bouton icone={Save} variante="principal" disabled={!v.reference || !v.designation} onClick={() => avecToast("Création de la pièce", () => api("/parc/pieces", { methode: "POST", corps: v }), () => "Pièce créée").then(onFait).catch(() => {})}>Enregistrer</Bouton><Bouton onClick={onFermer}>Annuler</Bouton></>}>
-      <div className="grid grid-cols-2 gap-x-3"><Texte libelle="Référence *" valeur={v.reference} onChange={(x) => f.maj("reference", x)} /><Texte libelle="Désignation *" valeur={v.designation} onChange={(x) => f.maj("designation", x)} />
+      <div className="grid grid-cols-2 gap-x-3"><Texte libelle="Référence *" majuscules valeur={v.reference} onChange={(x) => f.maj("reference", x)} /><Texte libelle="Désignation *" valeur={v.designation} onChange={(x) => f.maj("designation", x)} />
         <Liste libelle="Catégorie" valeur={v.categorie} onChange={(x) => f.maj("categorie", x)} vide={null} options={CATEGORIES} /><Texte libelle="Unité" valeur={v.unite} onChange={(x) => f.maj("unite", x)} />
         <Texte libelle="Stock initial" type="number" valeur={v.stock} onChange={(x) => f.maj("stock", x)} min="0" /><Texte libelle="Seuil d'alerte" type="number" valeur={v.seuil_alerte} onChange={(x) => f.maj("seuil_alerte", x)} min="0" />
         {prix && <Texte libelle="Prix unitaire" type="number" valeur={v.prix_unitaire} onChange={(x) => f.maj("prix_unitaire", x)} min="0" />}<Texte libelle="Emplacement" valeur={v.emplacement} onChange={(x) => f.maj("emplacement", x)} /></div>

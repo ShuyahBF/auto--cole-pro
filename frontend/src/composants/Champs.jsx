@@ -20,11 +20,19 @@ export function Champ({ libelle, children, aide }) {
   );
 }
 
-/** `majuscules` : intitulé d'une entité (nom de l'auto-école, de l'agence…) : saisi et enregistré TOUJOURS en MAJUSCULES (règle du propriétaire, 21/11/2026). */
-export function Texte({ libelle, valeur, onChange, type = "text", placeholder, aide, majuscules = false, ...autres }) {
+/** Règle du propriétaire (21/11/2026) : un champ CLÉ d'une fiche (nom de l'auto-école, code, référence, immatriculation…) est en MAJUSCULES (`majuscules`) ;
+ *  un nom ordinaire (ex. une agence « Bobo ») prend seulement une 1re lettre majuscule (`premiereMajuscule`). */
+export function transformer(valeur, majuscules, premiereMajuscule) {
+  if (majuscules) return valeur.toLocaleUpperCase("fr-FR");
+  if (premiereMajuscule) return valeur.charAt(0).toLocaleUpperCase("fr-FR") + valeur.slice(1);
+  return valeur;
+}
+
+
+export function Texte({ libelle, valeur, onChange, type = "text", placeholder, aide, majuscules = false, premiereMajuscule = false, ...autres }) {
   return (
     <Champ libelle={libelle} aide={aide}>
-      <input type={type} value={valeur ?? ""} onChange={(e) => onChange(majuscules ? e.target.value.toLocaleUpperCase("fr-FR") : e.target.value)} placeholder={placeholder}
+      <input type={type} value={valeur ?? ""} onChange={(e) => onChange(transformer(e.target.value, majuscules, premiereMajuscule))} placeholder={placeholder}
         className={`${classeChamp}${majuscules ? " uppercase" : ""}`} {...autres} />
     </Champ>
   );
