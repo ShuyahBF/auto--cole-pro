@@ -59,7 +59,7 @@ export default function Parametres() {
       <p className="mb-3 text-sm text-ardoise">{p.nom} · {p.pays} · devise {p.devise}. Les catégories, épreuves et pièces ci-dessous sont des points de départ : adaptez-les à la réglementation de votre pays.</p>
       <Bloc titre="Présentation (papier à en-tête des reçus)" modifie={modifie("nom", "telephone", "email", "adresse", "ville", "identifiant_fiscal", "agrement", "responsable")} onEnregistrer={() => enregistrer("Présentation", "nom", "telephone", "email", "adresse", "ville", "identifiant_fiscal", "agrement", "responsable")}>
         <div className="grid gap-x-3 sm:grid-cols-2 lg:grid-cols-3">
-          {[["nom", "Nom"], ["responsable", "Responsable"], ["telephone", "Téléphone"], ["email", "E-mail"], ["adresse", "Adresse"], ["ville", "Ville"], ["identifiant_fiscal", "IFU / RCCM"], ["agrement", "N° d'agrément"]].map(([k, l]) => <Texte key={k} libelle={l} valeur={p[k]} onChange={(x) => maj(k, x)} />)}
+          {[["nom", "Nom *"], ["responsable", "Responsable"], ["telephone", "Téléphone"], ["email", "E-mail"], ["adresse", "Adresse"], ["ville", "Ville"], ["identifiant_fiscal", "IFU / RCCM"], ["agrement", "N° d'agrément"]].map(([k, l]) => <Texte key={k} libelle={l} majuscules={k === "nom"} valeur={p[k]} onChange={(x) => maj(k, x)} />)}      {/* nom de l'auto-école : obligatoire (*) et en MAJUSCULES */}
         </div>
       </Bloc>
       <Bloc titre="Catégories de permis" modifie={modifie("categories")} onEnregistrer={() => enregistrer("Catégories", "categories")} aide="Code court (A, B, C…), libellé et âge minimum légal dans votre pays.">
@@ -79,7 +79,7 @@ export default function Parametres() {
           <h2 className="font-semibold">Agences</h2>
           <ul className="mt-2 divide-y divide-slate-100 text-sm">{agences.map((a) => <li key={a.id} className="flex items-center justify-between py-1.5"><span>{a.nom} {a.principale && <Pastille couleur="bleu">Principale</Pastille>} {!a.actif && <Pastille>Désactivée</Pastille>}</span>
             {!a.principale && <BoutonIcone icone={Power} libelle={a.actif ? "Désactiver" : "Activer"} couleur={a.actif ? "text-rose-600" : "text-emerald-600"} onClick={() => basculerAgence(a)} />}</li>)}</ul>
-          <div className="mt-3 flex items-end gap-2"><div className="flex-1"><Texte libelle="Nouvelle agence" valeur={nouvelleAgence} onChange={setNouvelleAgence} placeholder="Agence de Bobo-Dioulasso" /></div><div className="pb-3"><Bouton icone={Plus} petit disabled={!nouvelleAgence.trim()} onClick={ajouterAgence}>Ajouter</Bouton></div></div>
+          <div className="mt-3 flex items-end gap-2"><div className="flex-1"><Texte libelle="Nouvelle agence" majuscules valeur={nouvelleAgence} onChange={setNouvelleAgence} placeholder="AGENCE DE BOBO-DIOULASSO" /></div><div className="pb-3"><Bouton icone={Plus} petit disabled={!nouvelleAgence.trim()} onClick={ajouterAgence}>Ajouter</Bouton></div></div>
         </section>)}
     </div>
   );

@@ -9,7 +9,7 @@ const STYLES = {
 
 export default function Bouton({ icone: Icone, children, variante = "neutre", petit = false, attente = false, ...props }) {
   return (
-    <button {...props} disabled={props.disabled || attente}
+    <button {...props} disabled={props.disabled || attente} {...(variante === "principal" ? { "data-principal": "oui" } : {})}
       className={`inline-flex items-center justify-center gap-2 rounded-full font-semibold transition active:translate-y-px disabled:opacity-50 disabled:cursor-not-allowed ${petit ? "px-3.5 py-1.5 text-sm" : "px-5 py-2.5"} ${STYLES[variante]} ${props.className || ""}`}>
       {attente ? <span className="jauge" /> : Icone && <Icone size={petit ? 16 : 18} />}
       {children}

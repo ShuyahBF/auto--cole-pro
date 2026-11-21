@@ -22,7 +22,7 @@ def test_ecole_creee_avec_agence_et_directeur(client):
     r = client.post("/api/auth/login", json={"login": "dsahel", "mot_de_passe": "Motdepasse9"})
     hd = {"Authorization": "Bearer " + r.json()["jeton"]}
     assert [e["prefixe"] for e in client.get("/api/ecoles", headers=hd).json()] == ["SAH"]
-    assert [a["nom"] for a in client.get("/api/agences", headers=hd).json()] == ["Siège"]
+    assert [a["nom"] for a in client.get("/api/agences", headers=hd).json()] == ["SIÈGE"]
 
 
 def test_isolation_des_ecoles(client):
@@ -185,3 +185,17 @@ def test_pastilles_du_menu(client):
     nouvel_eleve(client, hs, t)                                     # dossier incomplet (pièces obligatoires non reçues)
     assert client.get("/api/notifications/compteurs", headers=hs).json() == {"/eleves": 1, "/impayes": 0, "/parc": 0}
     assert client.get("/api/notifications/compteurs", headers=entete(client, "mon")).json() == {"/eleves": 1, "/parc": 0}
+
+
+def test_intitules_des_entites_toujours_en_majuscules(client):
+    """Règle du propriétaire (21/11/2026) : le nom d'une auto-école et celui d'une agence sont enregistrés en MAJUSCULES (accents gardés)."""
+    h = entete(client, "sa")
+    r = client.post("/api/ecoles", json={"nom": "Sawali excellence auto-école", "prefixe": "SWL", "pays": "BF"}, headers=h)
+    assert r.status_code == 200, r.text
+    assert r.json()["nom"] == "SAWALI EXCELLENCE AUTO-ÉCOLE"
+    hd = entete(client, "dir")
+    r = client.post("/api/agences", json={"nom": "Agence nord"}, headers=hd)
+    assert r.status_code == 200, r.text
+    assert r.json()["nom"] == "AGENCE NORD"
+    r = client.put(f"/api/agences/{r.json()['id']}", json={"nom": "Agence nord-est"}, headers=hd)
+    assert r.status_code == 200 and r.json()["nom"] == "AGENCE NORD-EST"

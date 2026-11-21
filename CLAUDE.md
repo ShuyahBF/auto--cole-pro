@@ -50,3 +50,11 @@ pastilles de notifications dans le menu, présence déclarée à SAWALI, outils 
 - ADRESSE DE RETOUR de SAWALI (règle 7) : `POST /api/webhooks/liluvine-retour` (signée, 5 min) : `stats_du_jour`, `statut`, `reponse` (« 1 / 2 » confirment ou excusent l'examen), `desinscription` (STOP). À saisir dans SAWALI : émetteur « autoecole » → « URL de retour » = `https://<serveur AutoÉcole Pro>/api/webhooks/liluvine-retour` (« URL des statistiques » vide).
 - Aucun montant ni donnée de santé par WhatsApp ; le texte d'un message n'est jamais journalisé ; envoi toujours en arrière-plan.
 - Évaluations : lien personnel à usage unique (seule l'empreinte SHA-256 du jeton est gardée, 30 jours), page publique `/avis/<jeton>` sans compte, satisfaction 1-5, NPS 0-10, critères, publication seulement si le client l'a autorisée ; le moniteur évalué est déduit du livret.
+
+## Règles de saisie des fiches (propriétaire, 21/11/2026 : « comme règle générale », valables pour TOUTES les plateformes)
+- **Intitulés des entités en MAJUSCULES** : le nom de l'entité créée selon la plateforme (ici le nom de l'auto-école et celui de l'agence ; pour e-Kol le nom de l'école, etc.) est saisi et enregistré en MAJUSCULES, accents gardés.
+  Écran : `<Texte majuscules …>` (`composants/Champs.jsx`) ; serveur : `validation.texte(…, majuscules=True)` (le serveur ne se fie pas à l'écran). Test : `test_intitules_des_entites_toujours_en_majuscules`.
+- **Champs obligatoires marqués d'une étoile collée à l'intitulé** : « Nom* » (jamais « Nom * » ni « Nom (obligatoire) »). Il suffit de finir le libellé par `*` : `Champ` colle l'étoile (rouge) et prévient les lecteurs d'écran.
+- **Fiche incomplète = champs manquants en fond rouge** : module global `lib/validationFormulaires.js` (installé dans `main.jsx`, rien à ajouter fiche par fiche). Au clic sur le bouton principal d'une fenêtre ou d'un formulaire
+  (`Bouton variante="principal"` porte `data-principal`), les champs obligatoires vides passent en fond rouge (`.champ-manquant`), le premier reçoit le curseur, un toast liste les champs manquants et l'action n'est PAS lancée ; le rouge disparaît à la saisie.
+  Le serveur refait toujours le contrôle. Vérifié dans un vrai navigateur (fenêtre « Nouvelle auto-école »).
