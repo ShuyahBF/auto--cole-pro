@@ -3,6 +3,7 @@ import { Save } from "lucide-react";
 import { useState } from "react";
 import Bouton from "../composants/Bouton.jsx";
 import ChampMotDePasse from "../composants/ChampMotDePasse.jsx";
+import GoogleCompte from "../composants/GoogleCompte.jsx";
 import ForceMotDePasse from "../composants/ForceMotDePasse.jsx";
 import { Champ } from "../composants/Champs.jsx";
 import { api } from "../lib/api.js";
@@ -24,6 +25,7 @@ export default function Compte({ obligatoire = false }) {
         <Champ libelle="Nouveau mot de passe"><ChampMotDePasse valeur={nouveau} onChange={setNouveau} autoComplete="new-password" /></Champ><ForceMotDePasse valeur={nouveau} />
         <Bouton icone={Save} variante="principal" disabled={!ancien || !motDePasseAssezFort(nouveau)} onClick={go}>Changer le mot de passe</Bouton>
       </div>
+      {!obligatoire && <GoogleCompte />}
     </div>
   );
 }

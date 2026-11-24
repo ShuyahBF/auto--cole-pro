@@ -83,6 +83,12 @@ def verifier_non_bloque(u: dict | None) -> None:
         raise HTTPException(429, f"Compte bloqué {BLOCAGE_MINUTES} minutes après trop d'essais")
 
 
+def echec_acces(u: dict, detail: str) -> None:
+    """Échec d'un moyen d'accès (ex. retrait de la liaison Google avec un mauvais mot de passe) : compté et journalisé comme un mot de passe faux."""
+    _compter_echec(u, datetime.now(timezone.utc))
+    journaliser("connexion_refusee", {"id": u["id"], "login": u["login"], "role": u["role"], "ecole_id": u.get("ecole_id")}, detail)
+
+
 def connexion(login: str, mot_de_passe: str) -> dict:
     """Vérifie les identifiants ; blocage temporaire après TENTATIVES_MAX échecs de suite ; même réponse que le compte existe ou non."""
     u = db.brut().utilisateurs.find_one({"login": login.strip().lower()})
@@ -93,8 +99,13 @@ def connexion(login: str, mot_de_passe: str) -> dict:
             _compter_echec(u, datetime.now(timezone.utc))
             journaliser("connexion_refusee", acteur, "")
         raise HTTPException(401, "Identifiant ou mot de passe incorrect")
+    return ouvrir_session(u)
+
+
+def ouvrir_session(u: dict, moyen: str = "") -> dict:
+    """Étape commune à tous les moyens d'accès (mot de passe, Google) une fois la personne reconnue : remise à zéro des échecs, journal, jeton."""
     db.brut().utilisateurs.update_one({"id": u["id"]}, {"$set": {"echecs": 0, "bloque_jusqua": None}})
-    journaliser("connexion", acteur)
+    journaliser("connexion", {"id": u["id"], "login": u["login"], "role": u["role"], "ecole_id": u.get("ecole_id")}, moyen)
     return {"jeton": securite.creer_jeton(u["id"], u["role"]), "role": u["role"], "nom": u.get("nom_affiche", u["login"]), "login": u["login"],
             "doit_changer_mdp": bool(u.get("doit_changer_mdp")), "ecole_id": u.get("ecole_id"),
             "plateforme": u["role"] in roles.ROLES_PLATEFORME and not u.get("ecole_id")}
