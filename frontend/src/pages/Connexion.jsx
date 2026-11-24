@@ -7,6 +7,7 @@ import ChampMotDePasse from "../composants/ChampMotDePasse.jsx";
 import { Champ, Texte } from "../composants/Champs.jsx";
 import Logo from "../composants/Logo.jsx";
 import { api, jeton } from "../lib/api.js";
+import { googleDisponible, ouvrirGoogle, urlConnexionGoogle } from "../lib/google.js";
 import { useApp } from "../lib/contexte.jsx";
 
 export default function Connexion() {
@@ -14,6 +15,8 @@ export default function Connexion() {
   const [login, setLogin] = useState("");
   const [mdp, setMdp] = useState("");
   const [attente, setAttente] = useState(false);
+  const [google, setGoogle] = useState(false);            // le serveur est-il configuré pour Google ?
+  useEffect(() => { googleDisponible().then(setGoogle); }, []);
   const [etat, setEtat] = useState("verification");          // verification | actif | lent | injoignable
 
   // État du serveur : « Serveur actif », lent (> 3 s) ou injoignable.
@@ -54,6 +57,7 @@ export default function Connexion() {
           <Champ libelle="Mot de passe"><ChampMotDePasse valeur={mdp} onChange={setMdp} /></Champ>
           <Bouton type="submit" icone={LogIn} variante="principal" attente={attente} className="w-full">Se connecter</Bouton>
         </form>
+        {google && <Bouton icone={LogIn} className="mt-3 w-full" disabled={attente} onClick={() => ouvrirGoogle(urlConnexionGoogle())}>Se connecter avec Google</Bouton>}
         <p className={`mt-4 flex items-center justify-center gap-1.5 text-xs font-semibold ${etats.cl}`}><etats.Ic size={14} />{etats.txt}</p>
         <BandeauVersion className="mt-1 text-center" />
       </main>

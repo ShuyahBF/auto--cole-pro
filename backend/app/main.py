@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from . import auth, db, lot, roles, securite
 from .config import env, origines_site
 from .ecoles import routeur as routeur_ecoles
+from .google import routeur as routeur_google
 from .examens import routeur as routeur_examens
 from .seances import routeur as routeur_seances
 from .transferts import routeur as routeur_transferts
@@ -40,7 +41,7 @@ async def cycle_de_vie(_app):
 app = FastAPI(title="AutoÉcole Pro", version=lot.VERSION, lifespan=cycle_de_vie)
 # CORS : seul le site web (FRONTEND_ORIGIN) peut appeler l'API depuis un navigateur.
 app.add_middleware(CORSMiddleware, allow_origins=origines_site(), allow_methods=["*"], allow_headers=["*"])
-for _r in (routeur_utilisateurs, routeur_ecoles, routeur_tarifs, routeur_eleves, routeur_paiements, routeur_tableau, routeur_examens, routeur_seances, routeur_transferts, routeur_parc, routeur_pieces, routeur_messagerie, routeur_avis):
+for _r in (routeur_google, routeur_utilisateurs, routeur_ecoles, routeur_tarifs, routeur_eleves, routeur_paiements, routeur_tableau, routeur_examens, routeur_seances, routeur_transferts, routeur_parc, routeur_pieces, routeur_messagerie, routeur_avis):
     app.include_router(_r, prefix="/api")
 
 

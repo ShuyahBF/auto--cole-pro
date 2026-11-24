@@ -8,6 +8,7 @@ import Caisse from "./pages/Caisse.jsx";
 import Compte from "./pages/Compte.jsx";
 import Comptes from "./pages/Comptes.jsx";
 import Connexion from "./pages/Connexion.jsx";
+import ConnexionGoogle from "./pages/ConnexionGoogle.jsx";
 import Ecoles from "./pages/Ecoles.jsx";
 import Eleves from "./pages/Eleves.jsx";
 import Impayes from "./pages/Impayes.jsx";
@@ -29,6 +30,8 @@ export default function App() {
   const { pathname } = useLocation();
   // Page PUBLIQUE d'évaluation (lien reçu par WhatsApp) : accessible sans compte, hors du portail.
   if (pathname.startsWith("/avis/")) return <Routes><Route path="avis/:jeton" element={<AvisPublic />} /></Routes>;
+  // Retour de Google (connecté ou non) : page autonome qui échange le code contre la session
+  if (pathname.startsWith("/connexion-google")) return <ConnexionGoogle />;
   if (!pret) return <div className="min-h-dvh flex items-center justify-center"><span className="jauge" /></div>;
   const role = utilisateur?.role;
   const accueil = role === "mecanicien" ? "/parc" : ["super_admin", "directeur", "gestionnaire", "comptable"].includes(role) ? "/" : "/eleves";
